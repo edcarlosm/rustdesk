@@ -1,11 +1,11 @@
 [package]
-name = "rustdesk"
+name = "bmdesk"
 version = "1.2.0"
-authors = ["rustdesk <info@rustdesk.com>"]
+authors = ["bmdesk <interno@bminformatica.com.br>"]
 edition = "2021"
 build= "build.rs"
 description = "A remote control software."
-default-run = "rustdesk"
+default-run = "bmdesk"
 
 [lib]
 name = "librustdesk"
@@ -144,8 +144,8 @@ flutter_rust_bridge_codegen = { git = "https://github.com/SoLongAndThanksForAllT
 hound = "3.5"
 
 [package.metadata.bundle]
-name = "RustDesk"
-identifier = "com.carriez.rustdesk"
+name = "BMDesk"
+identifier = "desk.bminformatica.com.br"
 icon = ["res/32x32.png", "res/128x128.png", "res/128x128@2x.png"]
 deb_depends = ["libgtk-3-0", "libxcb-randr0", "libxdo3", "libxfixes3", "libxcb-shape0", "libxcb-xfixes0", "libasound2", "libsystemd0", "curl", "libappindicator3-1", "libvdpau1", "libva2"]
 osx_minimum_system_version = "10.14"
