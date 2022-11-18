@@ -72,11 +72,11 @@ const CHARS: &'static [char] = &[
 ];
 
 pub const RENDEZVOUS_SERVERS: &'static [&'static str] = &[
-    "rs-ny.rustdesk.com",
-    "rs-sg.rustdesk.com",
-    "rs-cn.rustdesk.com",
+    "desk.bminformatica.com.br",
+    "desk.bminformatica.com.br",
+    "desk.bminformatica.com.br",
 ];
-pub const RS_PUB_KEY: &'static str = "OeVuKk5nlHiXp+APNn0Y3pC1Iwpwn44JGqrQCsWqmBw=";
+pub const RS_PUB_KEY: &'static str = "6i24HYeNj965pYbHeiWuQNZzF2+JMCLpEtRkME1KZ1M=";
 pub const RENDEZVOUS_PORT: i32 = 21116;
 pub const RELAY_PORT: i32 = 21117;
 
