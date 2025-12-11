@@ -103,4 +103,4 @@ if __name__ == "__main__":
         processar_arquivo(arquivo)
         
     print("-" * 40)
-    print("Processo concluído! Verifique os arquivos.")
+    print("Processo concluído! Verifique os arquivos.")   
