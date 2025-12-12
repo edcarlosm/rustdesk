@@ -48,6 +48,9 @@ env:
   SIGN_BASE_URL: "${{ secrets.SIGN_BASE_URL }}"
 
 jobs:
+  generate-bridge:
+    uses: ./.github/workflows/bridge.yml
+
   build-BMDeskTempTopMostWindow:
     uses: ./.github/workflows/third-party-RustDeskTempTopMostWindow.yml
     with:
@@ -428,6 +431,49 @@ jobs:
           tag_name: ${{ env.TAG_NAME }}
           files: |
             ./SignOutput/rustdesk-*.exe
+
+  publish_unsigned:
+    needs:
+      - build-for-macOS
+      - build-for-windows-flutter
+      - build-for-windows-sciter
+    runs-on: ubuntu-latest
+    if: ${{ inputs.upload-artifact }}
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@master
+        with:
+          name: rustdesk-unsigned-macos-x86_64
+          path: ./
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@master
+        with:
+          name: rustdesk-unsigned-macos-aarch64
+          path: ./
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@master
+        with:
+          name: rustdesk-unsigned-windows-x86_64
+          path: ./windows-x86_64/
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@master
+        with:
+          name: rustdesk-unsigned-windows-x86
+          path: ./windows-x86/
+
+      - name: Combine unsigned app
+        run: |
+          tar czf rustdesk-${{ env.VERSION }}-unsigned.tar.gz *.dmg windows-x86_64 windows-x86
+
+      - name: Publish unsigned app
+        uses: softprops/action-gh-release@v1
+        with:
+          prerelease: true
+          tag_name: ${{ env.TAG_NAME }}
+          files: rustdesk-${{ env.VERSION }}-unsigned.tar.gz
 
   build-rustdesk-android:
     needs: [generate-bridge]
