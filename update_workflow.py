@@ -9,8 +9,13 @@ WORKFLOW_FILES = [
 NEW_APP_NAME = "BMDesk"
 OLD_APP_NAME = "RustDesk"
 
-# Termos que identificam jobs que DEVEMOS remover (apenas o indesejado)
-BLACKLIST_KEYWORDS = ['linux', 'ubuntu', 'mac', 'osx', 'ios', 'web', 'flatpak', 'appimage', 'dmg']
+# 1. Lista de Bloqueio (O que queremos remover)
+# Removemos 'ubuntu' daqui pois muitos jobs de Android rodam em 'ubuntu-latest' e podem ter esse nome.
+BLACKLIST_KEYWORDS = ['linux', 'mac', 'osx', 'ios', 'web', 'flatpak', 'appimage', 'dmg', 'freebsd', 'suse']
+
+# 2. Lista de Permissão (O que deve ser mantido, mesmo que pareça suspeito na blacklist)
+# Jobs de infraestrutura, setup ou cancelamento de workflow são cruciais.
+WHITELIST_KEYWORDS = ['setup', 'prepare', 'cancel', 'env', 'config', 'release', 'prerelease', 'publish', 'draft']
 
 def apply_renaming(line):
     """
@@ -69,18 +74,22 @@ def processar_arquivo(filepath):
 
             # Se a indentação for igual à dos jobs, é um novo job começando
             if indent == jobs_indentation:
-                # Lógica V2: Remover APENAS se estiver na Blacklist.
-                # Se for 'android', 'windows' ou genérico ('build'), MANTÉM.
-                should_remove = any(bad_term in name for bad_term in BLACKLIST_KEYWORDS)
+                # --- LÓGICA DE FILTRAGEM V3 ---
                 
-                # Exceção de segurança: Se o nome tiver 'windows' ou 'android',
-                # ignoramos a blacklist (ex: 'web-android-bridge' -> mantém pois é android)
-                if 'windows' in name or 'win' in name or 'android' in name:
+                # 1. Verificar Whitelist (Prioridade Máxima)
+                # Mantém jobs de infraestrutura ou que contenham Android/Windows explicitamente
+                is_whitelisted = any(term in name for term in WHITELIST_KEYWORDS)
+                is_target_platform = 'windows' in name or 'win' in name or 'android' in name
+                
+                if is_whitelisted or is_target_platform:
                     should_remove = False
+                else:
+                    # 2. Verificar Blacklist (Apenas se não for um job essencial)
+                    should_remove = any(bad_term in name for bad_term in BLACKLIST_KEYWORDS)
 
                 if should_remove:
                     skip_current_job = True
-                    print(f"  [REMOVER] Job encontrado e filtrado: {match.group(2)}")
+                    print(f"  [REMOVER] Job filtrado: {match.group(2)}")
                 else:
                     skip_current_job = False
                     print(f"  [MANTER] Job preservado: {match.group(2)}")
@@ -100,14 +109,11 @@ def processar_arquivo(filepath):
 
 if __name__ == "__main__":
     print("-" * 50)
-    print(f"Iniciando atualização V2 para: {NEW_APP_NAME}")
-    print("Estratégia: Remover apenas Linux/Mac/Web, manter Windows/Android e genéricos.")
+    print(f"Iniciando atualização V3 (Preservação de Setup) para: {NEW_APP_NAME}")
     print("-" * 50)
     
     for arquivo in WORKFLOW_FILES:
         processar_arquivo(arquivo)
         
     print("-" * 50)
-    print("ATENÇÃO: A compilação pode falhar no upload se os arquivos gerados")
-    print("pelo build script (Cargo.toml, pubspec.yaml) ainda tiverem o nome antigo.")
-    print("Certifique-se de prosseguir para a alteração dos arquivos de configuração.")
+    print("Concluído. Tente rodar o build novamente.")
